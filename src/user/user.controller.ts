@@ -15,7 +15,7 @@ import { UserService } from './user.service';
 import { AuthService } from './auth.service';
 import { Serialize } from '../interceptors/serialize-interceptor';
 
-@Controller('auth')
+@Controller('/auth')
 @Serialize(UserDto)
 export class UserController {
   constructor(
@@ -23,13 +23,19 @@ export class UserController {
     private readonly authService: AuthService,
   ) {}
 
-  @Post('signup')
+  @Post('/signup')
   createUser(@Body() body: CreateUserDto) {
     const { email, password } = body;
     return this.authService.signup(email, password);
   }
 
-  @Get(':id')
+  @Post('/signin')
+  signin(@Body() body: CreateUserDto) {
+    const { email, password } = body;
+    return this.authService.signin(email, password);
+  }
+
+  @Get('/:id')
   async findUser(@Param('id') id: string) {
     const user = await this.userService.findById(parseInt(id));
     if (!user) throw new NotFoundException('User not found');
@@ -41,12 +47,12 @@ export class UserController {
     return this.userService.findAllByEmail(email);
   }
 
-  @Delete(':id')
+  @Delete('/:id')
   deleteUser(@Param('id') id: string) {
     return this.userService.remove(parseInt(id));
   }
 
-  @Patch(':id')
+  @Patch('/:id')
   updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return this.userService.update(parseInt(id), body);
   }

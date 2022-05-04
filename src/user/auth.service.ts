@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { randomBytes, scrypt } from 'crypto';
 import { promisify } from 'util';
 
@@ -15,10 +19,18 @@ export class AuthService {
     return users.length === 0;
   }
 
-  async hashPassword(password: string) {
-    const salt = randomBytes(8).toString('hex');
-    const buf = (await scryptAsync(password, salt, 64)) as Buffer;
-    return `${salt}.${buf.toString('hex')}`;
+  generateSalt() {
+    return randomBytes(8).toString('hex');
+  }
+
+  async generateHashBuffer(password: string, salt: string) {
+    return (await scryptAsync(password, salt, 64)) as Buffer;
+  }
+
+  async hashPassword(password: string, salt?: string) {
+    const _salt = salt ?? this.generateSalt();
+    const buf = await this.generateHashBuffer(password, _salt);
+    return `${_salt}.${buf.toString('hex')}`;
   }
 
   async signup(email: string, password: string) {
@@ -27,6 +39,20 @@ export class AuthService {
 
     const hashedPassword = await this.hashPassword(password);
     const user = await this.userService.create(email, hashedPassword);
+    return user;
+  }
+
+  async signin(email: string, password: string) {
+    const [user] = await this.userService.findAllByEmail(email);
+    if (!user) throw new NotFoundException('User not found');
+
+    const [salt, hashedPassword] = user.password.split('.');
+    const passBuffer = await this.generateHashBuffer(password, salt);
+
+    if (hashedPassword !== passBuffer.toString('hex')) {
+      throw new BadRequestException('Invalid password');
+    }
+
     return user;
   }
 }

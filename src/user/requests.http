@@ -1,5 +1,14 @@
-### Create a new user
+### Create a new user - Signup
 POST http://localhost:3000/auth/signup
+Content-Type: application/json
+
+{
+  "email": "example@example.com",
+  "password": "password"
+}
+
+### Sign in
+POST http://localhost:3000/auth/signin
 Content-Type: application/json
 
 {
@@ -14,7 +23,7 @@ GET  http://localhost:3000/auth/1
 GET http://localhost:3000/auth?email=example@example.com
 
 ### Delete a user by id
-DELETE http://localhost:3000/auth/2
+DELETE http://localhost:3000/auth/1
 
 ### Update a user by id
 PATCH  http://localhost:3000/auth/1
