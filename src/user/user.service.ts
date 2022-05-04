@@ -21,7 +21,7 @@ export class UserService {
   }
 
   findAllByEmail(email: string) {
-    return this.userRepo.findOne({ email });
+    return this.userRepo.find({ email });
   }
 
   async update(id: number, attrs: Partial<User>) {
