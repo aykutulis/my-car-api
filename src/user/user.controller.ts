@@ -24,6 +24,15 @@ export class UserController {
     private readonly authService: AuthService,
   ) {}
 
+  @Get('/me')
+  async me(@Session() session: Record<string, unknown>) {
+    const userId = session.userId as string | undefined;
+    if (!userId) throw new NotFoundException('User not found');
+    const user = await this.userService.findById(parseInt(userId));
+    if (!user) throw new NotFoundException('User not found');
+    return user;
+  }
+
   @Post('/signup')
   async createUser(
     @Body() body: CreateUserDto,
