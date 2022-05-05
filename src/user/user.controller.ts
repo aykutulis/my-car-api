@@ -8,16 +8,18 @@ import {
   Param,
   Query,
   Session,
+  UseGuards,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 
-import { CreateUserDto, UpdateUserDto, UserDto } from './dtos';
+import { User } from './user.entity';
 import { UserService } from './user.service';
 import { AuthService } from './auth.service';
+import { CreateUserDto, UpdateUserDto, UserDto } from './dtos';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { Serialize } from '../interceptors/serialize-interceptor';
-import { User } from './user.entity';
+import { AuthGuard } from '../guards/auth-guard';
 
 @Controller('/auth')
 @Serialize(UserDto)
@@ -28,6 +30,7 @@ export class UserController {
   ) {}
 
   @Get('/me')
+  @UseGuards(AuthGuard)
   async me(
     @CurrentUser() user: User,
     @Session() session: Record<string, unknown>,
