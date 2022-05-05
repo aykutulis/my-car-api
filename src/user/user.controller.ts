@@ -7,15 +7,17 @@ import {
   Delete,
   Param,
   Query,
+  Session,
   NotFoundException,
   UnauthorizedException,
-  Session,
 } from '@nestjs/common';
 
 import { CreateUserDto, UpdateUserDto, UserDto } from './dtos';
 import { UserService } from './user.service';
 import { AuthService } from './auth.service';
+import { CurrentUser } from './decorators/current-user.decorator';
 import { Serialize } from '../interceptors/serialize-interceptor';
+import { User } from './user.entity';
 
 @Controller('/auth')
 @Serialize(UserDto)
@@ -26,13 +28,10 @@ export class UserController {
   ) {}
 
   @Get('/me')
-  async me(@Session() session: Record<string, unknown>) {
-    const userId = session.userId as string | undefined | null;
-    if (!userId) {
-      session.userId = null;
-      throw new UnauthorizedException('User not found');
-    }
-    const user = await this.userService.findById(parseInt(userId));
+  async me(
+    @CurrentUser() user: User,
+    @Session() session: Record<string, unknown>,
+  ) {
     if (!user) {
       session.userId = null;
       throw new UnauthorizedException('User not found');
