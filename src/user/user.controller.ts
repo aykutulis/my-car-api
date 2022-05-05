@@ -8,6 +8,7 @@ import {
   Param,
   Query,
   NotFoundException,
+  UnauthorizedException,
   Session,
 } from '@nestjs/common';
 
@@ -26,10 +27,16 @@ export class UserController {
 
   @Get('/me')
   async me(@Session() session: Record<string, unknown>) {
-    const userId = session.userId as string | undefined;
-    if (!userId) throw new NotFoundException('User not found');
+    const userId = session.userId as string | undefined | null;
+    if (!userId) {
+      session.userId = null;
+      throw new UnauthorizedException('User not found');
+    }
     const user = await this.userService.findById(parseInt(userId));
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) {
+      session.userId = null;
+      throw new UnauthorizedException('User not found');
+    }
     return user;
   }
 
@@ -53,6 +60,12 @@ export class UserController {
     const user = await this.authService.signin(email, password);
     session.userId = user.id;
     return user;
+  }
+
+  @Get('/signout')
+  async signout(@Session() session: Record<string, unknown>) {
+    session.userId = null;
+    return 'Signout success';
   }
 
   @Get('/:id')

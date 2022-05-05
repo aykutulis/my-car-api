@@ -16,7 +16,8 @@ export class UserService {
     return this.userRepo.save(user);
   }
 
-  findById(id: number) {
+  findById(id: number | null) {
+    if (!id) return null;
     return this.userRepo.findOne(id);
   }
 
