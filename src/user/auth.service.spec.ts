@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { AuthService } from './auth.service';
@@ -49,5 +49,39 @@ describe('AuthService', () => {
     await expect(service.signup('asd@asd.com', '123456')).rejects.toThrow(
       BadRequestException,
     );
+  });
+
+  it('throws error if user not found', async () => {
+    await expect(service.signin('asd@asd.com', '123456')).rejects.toThrow(
+      NotFoundException,
+    );
+  });
+
+  it('throws error if password is invalid', async () => {
+    const password = '123456';
+    const hashedPassword = await service.hashPassword(password);
+
+    fakeUserService.findAllByEmail = () =>
+      Promise.resolve([
+        { id: 1, email: 'asd@asd.com', password: hashedPassword },
+      ]);
+
+    await expect(service.signin('asd@asd.com', '1234567')).rejects.toThrow(
+      new BadRequestException('Invalid password'),
+    );
+  });
+
+  it('returns a user if correct password is provided', async () => {
+    const password = '123456';
+    const hashedPassword = await service.hashPassword(password);
+
+    fakeUserService.findAllByEmail = () =>
+      Promise.resolve([
+        { id: 1, email: 'asd@asd.com', password: hashedPassword },
+      ]);
+
+    const user = service.signin('asd@asd.com', password);
+
+    expect(user).toBeDefined();
   });
 });
