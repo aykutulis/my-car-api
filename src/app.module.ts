@@ -25,7 +25,7 @@ const cookieSession = require('cookie-session');
         username: configService.get<string>('DB_USER'),
         password: configService.get<string>('DB_PASSWORD'),
         synchronize: true,
-        entities: ['dist/**/*.entity{.ts,.js}'],
+        entities: ['dist/**/*.entity{.ts,.js}', 'src/**/*.entity{.ts,.js}'],
       }),
     }),
     UserModule,
