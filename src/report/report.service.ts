@@ -29,18 +29,24 @@ export class ReportService {
   }
 
   createEstimate({ make, model, lng, lat, year, mileage }: GetEstimateDto) {
-    return this.repo
+    const subQuery = this.repo
       .createQueryBuilder()
-      .select('AVG(price)', 'price')
+      .select('price')
       .where('make = :make', { make })
       .andWhere('model = :model', { model })
       .andWhere('lng - :lng BETWEEN -5 AND 5', { lng })
       .andWhere('lat - :lat BETWEEN -5 AND 5', { lat })
       .andWhere('year - :year BETWEEN -3 AND 3', { year })
-      .andWhere('mileage - :mileage BETWEEN -3000 AND 3000', { mileage })
       .andWhere('approved IS TRUE')
-      .orderBy('price', 'DESC')
-      .limit(3)
+      .orderBy('mileage - :mileage', 'DESC')
+      .setParameters({ mileage })
+      .limit(3);
+
+    return this.repo
+      .createQueryBuilder()
+      .select('AVG(x.price)', 'price')
+      .from(`(${subQuery.getQuery()})`, 'x')
+      .setParameters(subQuery.getParameters())
       .getRawOne();
   }
 }

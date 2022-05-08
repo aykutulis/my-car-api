@@ -6,7 +6,7 @@ Content-Type: application/json
   "make": "Ford",
   "model": "Fiesta",
   "year": 2015,
-  "mileage": 10000,
+  "mileage": 100000,
   "lng": 0,
   "lat": 0,
   "price": 10000
