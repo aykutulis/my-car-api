@@ -6,6 +6,8 @@ import { ReportModule } from './report/report.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { User } from './user/user.entity';
+import { Report } from './report/report.entity';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cookieSession = require('cookie-session');
 
@@ -24,8 +26,10 @@ const cookieSession = require('cookie-session');
         port: configService.get<number>('DB_PORT'),
         username: configService.get<string>('DB_USER'),
         password: configService.get<string>('DB_PASSWORD'),
+        dropSchema: configService.get<boolean>('DB_DROP_SCHEMA'),
+        entities: [User, Report],
         synchronize: true,
-        entities: ['dist/**/*.entity{.ts,.js}', 'src/**/*.entity{.ts,.js}'],
+        keepConnectionAlive: true,
       }),
     }),
     UserModule,
