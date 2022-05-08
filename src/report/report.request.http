@@ -1,5 +1,5 @@
 ### Create report
-POST http://localhost:3000/report
+POST http://localhost:3000/reports
 Content-Type: application/json
 
 {
@@ -13,9 +13,12 @@ Content-Type: application/json
 }
 
 ### Approve an existing report
-PATCH http://localhost:3000/report/1
+PATCH http://localhost:3000/reports/1
 Content-Type: application/json
 
 {
   "approved": true
 }
+
+### Get reports
+GET http://localhost:3000/reports?make=Ford&model=Fiesta&year=2015&mileage=10000&lng=0&lat=0
