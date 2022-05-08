@@ -27,8 +27,8 @@ const cookieSession = require('cookie-session');
         username: configService.get<string>('DB_USER'),
         password: configService.get<string>('DB_PASSWORD'),
         dropSchema: configService.get<boolean>('DB_DROP_SCHEMA'),
+        synchronize: configService.get<boolean>('DB_SYNC_SCHEMA'),
         entities: [User, Report],
-        synchronize: true,
         keepConnectionAlive: true,
       }),
     }),
@@ -45,7 +45,13 @@ const cookieSession = require('cookie-session');
   ],
 })
 export class AppModule {
+  constructor(private readonly configService: ConfigService) {}
+
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(cookieSession({ keys: ['secret'] })).forRoutes('*');
+    consumer
+      .apply(
+        cookieSession({ keys: [this.configService.get<string>('COOKIE_KEY')] }),
+      )
+      .forRoutes('*');
   }
 }
