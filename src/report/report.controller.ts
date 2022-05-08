@@ -38,7 +38,9 @@ export class ReportController {
   }
 
   @Get()
-  getEstimate(@Query() query: GetEstimateDto) {
-    return query;
+  async getEstimate(@Query() query: GetEstimateDto) {
+    const report = await this.reportService.createEstimate(query);
+    console.log(report);
+    return report;
   }
 }
